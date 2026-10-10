@@ -1,0 +1,1 @@
+{"description":"EveryCalc: free finance calculators as a REST API and MCP server","license":"MIT","name":"everycalc-mcp","scripts":{"test":"node test/test.mjs && node test/test-mcp.mjs"},"type":"module","version":"1.0.0"}
