@@ -1,1 +1,18 @@
-{"$schema":"https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json","description":"Free finance calculators as MCP tools: mortgage, refinance, loans, compound interest, salary, tips. Every result links the web calculator.","name":"io.github.xoyabunx/everycalc","remotes":[{"transport":{"type":"streamable-http","url":"https://everycalc.xyz/mcp"}}],"repository":{"source":"github","url":"https://github.com/xOyabunx/everycalc"},"title":"EveryCalc","version":"1.0.0","websiteUrl":"https://everycalc.xyz"}
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "description": "8 free finance calculators as MCP tools: mortgage, refinance, loans, interest, salary, tips.",
+  "name": "io.github.xoyabunx/everycalc",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://everycalc.xyz/mcp"
+    }
+  ],
+  "repository": {
+    "source": "github",
+    "url": "https://github.com/xOyabunx/everycalc"
+  },
+  "title": "EveryCalc",
+  "version": "1.0.0",
+  "websiteUrl": "https://everycalc.xyz"
+}
