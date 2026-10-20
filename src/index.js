@@ -4945,6 +4945,109 @@ var MCP_TOOL_RUNNERS = {
   }
 };
 
+/* TDQS upgrade (Oct 17, 2026): per-tool usage guidance, behavioural
+   annotations, and a truthful shared output schema for every tool. */
+var MCP_TOOL_GUIDANCE = {
+  calculate_mortgage: "the user is buying a home and wants the full monthly payment including tax, insurance, PMI and HOA. For a plain loan without housing costs use calculate_loan; for the most they can afford use calculate_affordability.",
+  calculate_refinance: "the user already has a loan and is weighing a refinance offer; it returns the break-even month and lifetime savings. For a brand-new loan payment use calculate_loan or calculate_mortgage.",
+  calculate_affordability: "the user asks how much house they can afford on their income. For the payment on a specific home price use calculate_mortgage.",
+  calculate_loan: "the user wants the payment, total interest or payoff schedule for a generic loan. For cars use calculate_auto_loan; for homes calculate_mortgage; for student debt calculate_student_loan_payoff.",
+  calculate_compound_interest: "the user asks how savings or an investment grows over time with regular contributions. For a 401k with employer match use calculate_401k; for a retirement balance use calculate_retirement_savings_planner.",
+  calculate_percentage: "the user needs a percent-of, what-percent or percent-change calculation with no financial product attached.",
+  calculate_tip: "the user is tipping or splitting a restaurant bill.",
+  calculate_salary: "the user converts pay between hourly, weekly and annual figures. For take-home pay after taxes use calculate_paycheck or calculate_income_tax_estimator.",
+  calculate_age: "the user asks an exact age from a birth date, or days lived. For a plain span between two dates use calculate_date_duration.",
+  calculate_auto_loan: "the user is financing a car purchase and wants the payment and total interest. For whether the car fits their budget use calculate_car_affordability; for leasing use calculate_lease_vs_buy.",
+  calculate_date_duration: "the user needs the days or business days between two dates. For age from a birth date use calculate_age.",
+  calculate_debt_payoff: "the user has several debts and wants a payoff plan comparing snowball and avalanche. For a single credit card use calculate_credit_card_payoff.",
+  calculate_inflation: "the user asks what money will be worth in the future, or what a future amount costs in today's dollars. For whether a raise keeps up use calculate_raise_vs_inflation.",
+  calculate_rent_vs_buy: "the user is deciding between renting and buying a home over a period of years. For the buying payment alone use calculate_mortgage.",
+  calculate_roth_vs_traditional: "the user is choosing between Roth and traditional retirement contributions. For converting an existing balance use calculate_roth_conversion.",
+  calculate_unit_converter: "the user needs a unit conversion for length, weight, temperature, volume or speed.",
+  calculate_word_counter: "the user pastes text and wants word, character or sentence counts and reading time.",
+  calculate_401k: "the user projects a 401k with contributions and an employer match. For a general investment projection use calculate_compound_interest; for TSP use calculate_tsp.",
+  calculate_arm_vs_fixed: "the user compares an adjustable rate mortgage with a fixed rate loan, including the worst case. For a standard fixed payment use calculate_mortgage.",
+  calculate_biweekly_mortgage: "the user asks what paying half the mortgage every two weeks saves versus monthly payments.",
+  calculate_bmi_tdee: "the user asks about BMI category, maintenance calories, or cut and bulk targets.",
+  calculate_capital_gains_tax: "the user sells or plans to sell investments and needs the federal tax on the gains.",
+  calculate_car_affordability: "the user asks what car payment fits their budget including insurance, fuel and maintenance. For loan figures on a specific car use calculate_auto_loan.",
+  calculate_credit_card_payoff: "the user wants to clear a credit card balance and asks how long it takes or how much interest it costs. For several different debts use calculate_debt_payoff.",
+  calculate_emergency_fund: "the user asks how big an emergency fund should be, or how close they are to the target.",
+  calculate_income_tax_estimator: "the user wants a federal income tax estimate for a salary. For per-paycheck take-home pay use calculate_paycheck.",
+  calculate_lease_vs_buy: "the user compares leasing a car against buying it. For loan-only figures use calculate_auto_loan.",
+  calculate_net_worth: "the user lists assets and debts and wants their net worth.",
+  calculate_paycheck: "the user wants take-home pay per paycheck after federal tax and FICA. For an annual tax picture use calculate_income_tax_estimator.",
+  calculate_property_tax_estimator: "the user needs a property tax estimate from a home value and tax rate. For the full mortgage payment use calculate_mortgage.",
+  calculate_raise_vs_inflation: "the user asks whether a raise actually beats inflation in real terms.",
+  calculate_retirement_savings_planner: "the user projects a retirement balance from current savings and monthly contributions. For a 401k with employer match use calculate_401k.",
+  calculate_roth_conversion: "the user weighs converting traditional retirement money to a Roth and paying the tax now. For choosing future contributions use calculate_roth_vs_traditional.",
+  calculate_sba_loan: "the user is pricing an SBA small business loan including the guarantee fee.",
+  calculate_social_security_estimator: "the user estimates a Social Security retirement benefit from their earnings record.",
+  calculate_aft: "a soldier provides Army Fitness Test event results and wants the scores and pass or fail.",
+  calculate_bah: "the user needs a Basic Allowance for Housing rate by pay grade, location table and dependency status. For total monthly military pay use calculate_military_pay.",
+  calculate_brs_vs_high3: "a service member compares the legacy High-3 pension with the Blended Retirement System pension.",
+  calculate_gi_bill: "the user asks what the Post-9/11 GI Bill covers or how much entitlement remains.",
+  calculate_les_decoder: "the user has Leave and Earnings Statement lines and wants the net pay explained.",
+  calculate_military_pay: "the user wants basic pay for a pay grade and years of service from the 2026 table. For housing allowance use calculate_bah.",
+  calculate_military_retirement_pension: "the user estimates monthly military retired pay. For a BRS versus High-3 comparison use calculate_brs_vs_high3.",
+  calculate_pcs_move: "the user is planning a PCS move and wants DLA, TLE and per diem estimates.",
+  calculate_sgli_vs_private_insurance: "the user compares SGLI coverage cost with a private life insurance quote.",
+  calculate_tsp: "the user projects a Thrift Savings Plan balance with contributions and agency match. For a civilian 401k use calculate_401k.",
+  calculate_va_disability: "the user wants VA disability compensation for a combined rating and dependents from the 2026 rates.",
+  calculate_act_score: "the user has ACT section scores and wants the composite, STEM and ELA scores.",
+  calculate_ap_exam_score: "the user estimates an AP exam score from multiple choice and free response results.",
+  calculate_college_acceptance: "the user wants a rough admission chance for a college selectivity tier.",
+  calculate_college_major_roi: "the user compares a college major's cost against its earnings payback.",
+  calculate_college_roi: "the user asks whether a degree pays off versus the no-degree baseline.",
+  calculate_dorm_vs_apartment: "a student compares annual dorm cost with renting an apartment.",
+  calculate_fafsa_sai_estimator: "the user estimates their FAFSA Student Aid Index.",
+  calculate_final_exam: "the user asks what score they need on a final exam to reach a target course grade.",
+  calculate_gpa: "the user computes a GPA from course grades and credits. To plan grades for a target GPA use calculate_gpa_planner.",
+  calculate_gpa_planner: "the user asks what term GPA they need to reach a target cumulative GPA.",
+  calculate_graduate_school_roi: "the user weighs graduate school cost against the salary premium it brings.",
+  calculate_gre_score_estimator: "the user estimates GRE verbal and quant scores from practice results.",
+  calculate_high_school_course_planner: "the user checks remaining high school graduation credits by subject and state.",
+  calculate_lsat_score_estimator: "the user estimates an LSAT scaled score from practice section results.",
+  calculate_mcat_score_estimator: "the user estimates MCAT section scores from practice results.",
+  calculate_premed_course_planner: "a premed student checks progress across the prerequisite courses.",
+  calculate_psat_score: "the user estimates PSAT section scores from practice results.",
+  calculate_sat_score: "the user estimates SAT section scores from practice results.",
+  calculate_scholarship_roi_tracker: "the user weighs whether a scholarship application is worth the time, or ranks several by expected value.",
+  calculate_student_budget: "a student builds a monthly budget from income against rent, food, books, transport and fun spending.",
+  calculate_student_loan_payoff: "the user wants the payoff time and total interest on a student loan. For other loans use calculate_loan.",
+  calculate_textbook_cost: "the user compares buying new, buying used, renting and digital textbook costs.",
+  calculate_transfer_credit_planner: "the user plans how transfer credits change their remaining time to degree."
+};
+var MCP_OUTPUT_SCHEMA = {
+  type: "object",
+  properties: {
+    ok: { type: "boolean", description: "True when the calculation succeeded." },
+    tool: { type: "string", description: "Name of the tool that ran." },
+    inputs: { type: "object", description: "The normalized inputs the calculation used." },
+    results: { type: "object", description: "The computed figures for this calculator." },
+    calculator_url: { type: "string", description: "Deep link to the matching interactive calculator on everycalc.xyz." },
+  },
+  required: ["ok", "tool", "results", "calculator_url"],
+};
+MCP_TOOLS.forEach(function (t) {
+  var g = MCP_TOOL_GUIDANCE[t.name];
+  if (g) {
+    var imp = t.description.indexOf(" IMPORTANT:");
+    if (imp >= 0) {
+      t.description = t.description.slice(0, imp) + " Use when " + g + t.description.slice(imp);
+    } else {
+      t.description = t.description + " Use when " + g;
+    }
+  }
+  t.annotations = {
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
+  };
+  t.outputSchema = MCP_OUTPUT_SCHEMA;
+});
+
 function mcpCallTool(name, args) {
   var runner = MCP_TOOL_RUNNERS[name];
   if (!runner) {
@@ -4956,19 +5059,16 @@ function mcpCallTool(name, args) {
   try {
     var inputs = runner.build(args || {});
     var results = runner.run(inputs);
+    var payload = {
+      ok: true,
+      tool: name,
+      inputs: inputs,
+      results: results,
+      calculator_url: runner.url,
+    };
     return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify({
-            ok: true,
-            tool: name,
-            inputs: inputs,
-            results: results,
-            calculator_url: runner.url,
-          }),
-        },
-      ],
+      content: [{ type: "text", text: JSON.stringify(payload) }],
+      structuredContent: payload,
     };
   } catch (e) {
     return {
@@ -5047,7 +5147,7 @@ async function handleMcp(request) {
       msg.id,
       {
         tools: MCP_TOOLS.map(function (t) {
-          return { name: t.name, description: t.description, inputSchema: t.inputSchema };
+          return { name: t.name, description: t.description, inputSchema: t.inputSchema, outputSchema: t.outputSchema, annotations: t.annotations };
         }),
       },
       null,
@@ -5069,6 +5169,14 @@ export default {
     }
     if (url.pathname === "/mcp") {
       return handleMcp(request);
+    }
+    if (url.pathname === "/go/workbook") {
+      return Response.redirect("https://everycalc.gumroad.com/l/debt-payoff-planner", 302);
+    }
+    if (url.pathname === "/.well-known/glama.json") {
+      return new Response("{\n  \"$schema\": \"https://glama.ai/mcp/schemas/connector.json\",\n  \"claim\": \"glama_claim_l4ZuKXHzsA4BjfcgPCYKlc0XWdHiEX9w\"\n}\n", {
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=300" },
+      });
     }
     return env.ASSETS.fetch(request);
   },
