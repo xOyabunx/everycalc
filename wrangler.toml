@@ -1,17 +1,21 @@
 # Wrangler config for the `everycalc` Cloudflare Worker.
 #
+# DEPLOY-TIME PLACEHOLDER: replace ASSETS_DIRECTORY below with the absolute
+# path of the static-site deploy directory (the folder containing index.html,
+# css/, js/, and the 36 page directories). Example:
+#   directory = "/home/hatch/workspace/everycalc-deploy"
+#
 # This worker serves the static site AND the JSON API from one domain:
 #   - any path starting with /api/  -> handled by src/index.js
 #   - everything else               -> served from static assets
-#
-# Before deploying, set `directory` below to the absolute path of your
-# static-site build (the folder containing index.html, css/, js/, etc.).
+# Static-asset behavior matches the previous assets-only deployment:
+# html_handling = auto-trailing-slash, not_found_handling = none.
 
 name = "everycalc"
 compatibility_date = "2026-09-29"
 main = "src/index.js"
 
 [assets]
-directory = "./public"
+directory = "/home/hatch/workspace/everycalc-deploy"
 html_handling = "auto-trailing-slash"
 not_found_handling = "none"
