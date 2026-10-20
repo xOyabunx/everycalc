@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "description": "8 free finance calculators as MCP tools: mortgage, refinance, loans, interest, salary, tips.",
-  "name": "io.github.xOyabunx/everycalc",
+  "name": "xyz.everycalc/every-calc",
+  "title": "EveryCalc",
+  "description": "69 free finance, military, school and everyday calculators as MCP tools.",
+  "repository": {
+    "url": "https://github.com/xOyabunx/everycalc",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "websiteUrl": "https://everycalc.xyz",
   "remotes": [
     {
       "type": "streamable-http",
       "url": "https://everycalc.xyz/mcp"
     }
-  ],
-  "repository": {
-    "source": "github",
-    "url": "https://github.com/xOyabunx/everycalc"
-  },
-  "title": "EveryCalc",
-  "version": "1.0.0",
-  "websiteUrl": "https://everycalc.xyz"
+  ]
 }
