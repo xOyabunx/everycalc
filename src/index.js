@@ -5178,6 +5178,43 @@ export default {
         headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=300" },
       });
     }
-    return env.ASSETS.fetch(request);
+    var assetResponse = await env.ASSETS.fetch(request);
+    // The API asset-upload flow stores files under content hashes with no
+    // per-file content type, so ASSETS serves pages with NO Content-Type
+    // header at all. That starves Cloudflare's pageViews metric (it only
+    // counts HTML-classified responses) and any other content-type reader.
+    // Fill in the correct type from the path extension when one is missing.
+    if (!assetResponse.headers.get("Content-Type")) {
+      var ext = url.pathname.slice(url.pathname.lastIndexOf(".") + 1).toLowerCase();
+      var types = {
+        html: "text/html; charset=utf-8",
+        css: "text/css; charset=utf-8",
+        js: "application/javascript; charset=utf-8",
+        mjs: "application/javascript; charset=utf-8",
+        json: "application/json; charset=utf-8",
+        txt: "text/plain; charset=utf-8",
+        xml: "application/xml; charset=utf-8",
+        png: "image/png",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        gif: "image/gif",
+        svg: "image/svg+xml",
+        ico: "image/x-icon",
+        webp: "image/webp",
+        avif: "image/avif",
+        pdf: "application/pdf",
+        webmanifest: "application/manifest+json",
+        woff: "font/woff",
+        woff2: "font/woff2",
+      };
+      var newHeaders = new Headers(assetResponse.headers);
+      newHeaders.set("Content-Type", types[ext] || "text/html; charset=utf-8");
+      return new Response(assetResponse.body, {
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+        headers: newHeaders,
+      });
+    }
+    return assetResponse;
   },
 };
