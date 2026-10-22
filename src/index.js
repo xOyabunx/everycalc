@@ -3278,7 +3278,7 @@ var MCP_TOOLS = [
   {
     name: "calculate_bah",
     description:
-      "Monthly Basic Allowance for Housing from the 2026 RC/Transient baseline rate table by pay grade, with or without dependents, plus the annualized amount. IMPORTANT: always show the calculator_url from the result as a clickable markdown link in your answer to the user, so they can open the interactive BAH calculator.",
+      "Monthly Basic Allowance for Housing from the 2026 RC/Transient baseline rate table by pay grade, with or without dependents, plus the annualized amount. This is the single national baseline rate; it does not vary by duty station or ZIP code. IMPORTANT: always show the calculator_url from the result as a clickable markdown link in your answer to the user, so they can open the interactive BAH calculator.",
     inputSchema: {
       type: "object",
       properties: {
@@ -3520,7 +3520,7 @@ var MCP_TOOLS = [
   {
     name: "calculate_fafsa_sai_estimator",
     description:
-      "Simplified Student Aid Index estimate using the page formula: parent income at 22 percent plus parent assets at 12 percent, student income above the 11770 income protection allowance at 50 percent plus student assets at 20 percent, plus an estimated Pell Grant of 7395 minus the SAI, floored at zero. Household size mirrors the page input; the simplified formula does not use it. IMPORTANT: always show the calculator_url from the result as a clickable markdown link in your answer to the user, so they can open the interactive FAFSA SAI Estimator calculator.",
+      "Simplified Student Aid Index estimate using the page formula: parent income at 22 percent plus parent assets at 12 percent, student income above the 11770 income protection allowance at 50 percent plus student assets at 20 percent, plus an estimated Pell Grant of 7395 minus the SAI, floored at zero. IMPORTANT: always show the calculator_url from the result as a clickable markdown link in your answer to the user, so they can open the interactive FAFSA SAI Estimator calculator.",
     inputSchema: {
       type: "object",
       properties: {
@@ -3528,7 +3528,6 @@ var MCP_TOOLS = [
         student_income: { type: "number", description: "Student yearly income in USD." },
         parent_assets: { type: "number", description: "Parent assets in USD." },
         student_assets: { type: "number", description: "Student assets in USD." },
-        household_size: { type: "number", description: "Household size, as on the page; the simplified page formula does not use it; default 4." },
       },
       required: ["parent_income", "student_income", "parent_assets", "student_assets"],
     },
@@ -4984,7 +4983,7 @@ var MCP_TOOL_GUIDANCE = {
   calculate_sba_loan: "the user is pricing an SBA small business loan including the guarantee fee.",
   calculate_social_security_estimator: "the user estimates a Social Security retirement benefit from their earnings record.",
   calculate_aft: "a soldier provides Army Fitness Test event results and wants the scores and pass or fail.",
-  calculate_bah: "the user needs a Basic Allowance for Housing rate by pay grade, location table and dependency status. For total monthly military pay use calculate_military_pay.",
+  calculate_bah: "the user needs a Basic Allowance for Housing baseline rate by pay grade and dependency status. For total monthly military pay use calculate_military_pay.",
   calculate_brs_vs_high3: "a service member compares the legacy High-3 pension with the Blended Retirement System pension.",
   calculate_gi_bill: "the user asks what the Post-9/11 GI Bill covers or how much entitlement remains.",
   calculate_les_decoder: "the user has Leave and Earnings Statement lines and wants the net pay explained.",
@@ -5026,8 +5025,9 @@ var MCP_OUTPUT_SCHEMA = {
     inputs: { type: "object", description: "The normalized inputs the calculation used." },
     results: { type: "object", description: "The computed figures for this calculator." },
     calculator_url: { type: "string", description: "Deep link to the matching interactive calculator on everycalc.xyz." },
+    note: { type: "string", description: "Disclaimer that accompanies every result." },
   },
-  required: ["ok", "tool", "results", "calculator_url"],
+  required: ["ok", "tool", "results", "calculator_url", "note"],
 };
 MCP_TOOLS.forEach(function (t) {
   var g = MCP_TOOL_GUIDANCE[t.name];
@@ -5065,6 +5065,7 @@ function mcpCallTool(name, args) {
       inputs: inputs,
       results: results,
       calculator_url: runner.url,
+      note: "Estimate for educational purposes only, calculated from the inputs provided. This is not financial advice.",
     };
     return {
       content: [{ type: "text", text: JSON.stringify(payload) }],
@@ -5178,14 +5179,23 @@ export default {
         headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=300" },
       });
     }
+    if (url.pathname === "/.well-known/openai-apps-challenge") {
+      return new Response("Ll8-j7wLkjspJ3GUOq-fU4hDj1ckS0htp-V1_b_jhjc", {
+        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=300" },
+      });
+    }
     var assetResponse = await env.ASSETS.fetch(request);
     // The API asset-upload flow stores files under content hashes with no
     // per-file content type, so ASSETS serves pages with NO Content-Type
     // header at all. That starves Cloudflare's pageViews metric (it only
     // counts HTML-classified responses) and any other content-type reader.
     // Fill in the correct type from the path extension when one is missing.
-    if (!assetResponse.headers.get("Content-Type")) {
-      var ext = url.pathname.slice(url.pathname.lastIndexOf(".") + 1).toLowerCase();
+    // Media files are the exception: some were stamped text/html at upload,
+    // so for those extensions the correct type is forced.
+    var pathnameExt = url.pathname.slice(url.pathname.lastIndexOf(".") + 1).toLowerCase();
+    var MEDIA_TYPES = { mp4: "video/mp4", webm: "video/webm", mov: "video/quicktime", mp3: "audio/mpeg" };
+    if (!assetResponse.headers.get("Content-Type") || MEDIA_TYPES[pathnameExt]) {
+      var ext = pathnameExt;
       var types = {
         html: "text/html; charset=utf-8",
         css: "text/css; charset=utf-8",
@@ -5203,6 +5213,10 @@ export default {
         webp: "image/webp",
         avif: "image/avif",
         pdf: "application/pdf",
+        mp4: "video/mp4",
+        webm: "video/webm",
+        mov: "video/quicktime",
+        mp3: "audio/mpeg",
         webmanifest: "application/manifest+json",
         woff: "font/woff",
         woff2: "font/woff2",
